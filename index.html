@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Projet INF4163 – Réchauffement Climatique</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0F2A3D;
+            --navy-light: #1B3E56;
+            --terracotta: #D9622B;
+            --terracotta-dark: #B04E20;
+            --sage: #2E7D6B;
+            --cream: #F6F3EC;
+            --paper: #FFFFFF;
+            --ink: #21221F;
+            --ink-muted: #5B5D57;
+            --line: #E3DFD3;
+            --radius: 10px;
+            --shadow: 0 1px 2px rgba(15,42,61,0.06), 0 6px 20px rgba(15,42,61,0.06);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        /* ---------- Header ---------- */
+        header {
+            background: linear-gradient(160deg, var(--navy) 0%, var(--navy-light) 100%);
+            color: #F4F1E8;
+            padding: 36px 24px 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 3px solid var(--terracotta);
+        }
+
+        header img {
+            width: 64px;
+            height: 64px;
+            vertical-align: middle;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            padding: 6px;
+        }
+
+        header h1 {
+            font-size: clamp(22px, 3vw, 32px);
+            margin: 16px 0 6px;
+        }
+
+        header h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #C9DCE6;
+            margin: 0;
+        }
+
+        /* ---------- Tabs ---------- */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: var(--paper);
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 0 rgba(15,42,61,0.03);
+        }
+
+        .tabs button {
+            flex: 1 1 auto;
+            min-width: 140px;
+            padding: 16px 12px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink-muted);
+            letter-spacing: 0.01em;
+            transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .tabs button:hover {
+            color: var(--navy);
+            background: rgba(15,42,61,0.03);
+        }
+
+        .tabs button.active {
+            color: var(--terracotta-dark);
+            border-bottom-color: var(--terracotta);
+            background: rgba(217,98,43,0.06);
+        }
+
+        .tabs button:focus-visible {
+            outline: 2px solid var(--sage);
+            outline-offset: -2px;
+        }
+
+        /* ---------- Tab content ---------- */
+        .tab-content {
+            display: none;
+            padding: 32px 24px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fade-in 0.25s ease;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content > h2 {
+            font-size: 22px;
+            margin: 0 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+            color: var(--navy);
+        }
+
+        /* Card wrapper around each embedded viz, without touching the embed itself */
+        tableau-viz,
+        iframe {
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: var(--radius);
+            background: var(--paper);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        iframe {
+            min-height: 500px;
+        }
+
+        /* ---------- Results (SP) ---------- */
+        .sp-group {
+            margin-bottom: 28px;
+        }
+
+        .sp-group h3 {
+            font-size: 16px;
+            color: var(--terracotta-dark);
+            margin: 0 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .sp-card {
+            padding: 14px 18px;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            font-size: 14px;
+            color: var(--ink);
+        }
+
+        .sp-card.sp-error {
+            border-color: var(--terracotta);
+            color: var(--terracotta-dark);
+            background: rgba(217,98,43,0.06);
+        }
+
+        .sp-card .sp-loading {
+            color: var(--ink-muted);
+            font-style: italic;
+        }
+
+        /* ---------- Team ---------- */
+        .team-note {
+            background: rgba(46,125,107,0.08);
+            border: 1px solid var(--sage);
+            border-radius: var(--radius);
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--ink);
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            padding: 14px 18px;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+        }
+
+        .team-member img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid var(--sage);
+        }
+
+        .team-member p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--ink-muted);
+        }
+
+        .team-member p strong {
+            display: block;
+            font-family: 'Fraunces', serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 2px;
+        }
+
+        /* ---------- Footer ---------- */
+        footer {
+            text-align: center;
+            padding: 18px;
+            background: var(--navy);
+            color: #C9DCE6;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+        }
+
+        /* ---------- Accessibility ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            .tab-content.active { animation: none; }
+        }
+
+        @media (max-width: 640px) {
+            .tabs button { font-size: 13px; padding: 14px 8px; }
+            .tab-content { padding: 24px 16px 32px; }
+        }
+    </style>
+
+    <script>
+        function openTab(tabName) {
+            let contents = document.querySelectorAll(".tab-content");
+            let buttons = document.querySelectorAll(".tabs button");
+
+            contents.forEach(c => c.classList.remove("active"));
+            buttons.forEach(b => b.classList.remove("active"));
+
+            document.getElementById(tabName).classList.add("active");
+            document.querySelector(`[data-tab='${tabName}']`).classList.add("active");
+        }
+    </script>
+</head>
+
+<body>
+
+<header>
+    <img src="logo.png" alt="Logo du groupe">
+    <h1>Sensibilisation au réchauffement climatique</h1>
+    <h3>Groupe ClimateVision · Projet INF4163</h3>
+</header>
+
+<div class="tabs">
+    <button data-tab="temp" onclick="openTab('temp')">Températures</button>
+    <button data-tab="pollution" onclick="openTab('pollution')">Pollution CO₂</button>
+    <button data-tab="precip" onclick="openTab('precip')">Précipitations</button>
+    <button data-tab="results" onclick="openTab('results')">Résultats SP</button>
+    <button data-tab="team" onclick="openTab('team')">Équipe</button>
+</div>
+
+<!-- Températures -->
+<div id="temp" class="tab-content">
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/Temperature2023-2025/DBoardTemperature2023_1"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/Temperature2023-2025/DBoardTemperature2024"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/Temperature2023-2025/DBoardTemperature2025"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+</div>
+
+<!-- Pollution -->
+<div id="pollution" class="tab-content">
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/testpublication/Tableaudebord1"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/TableaDeBordPollution2024/Tableaudebord1"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/TableauDePollution2025/Tableaudebord1"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+</div>
+
+<!-- Précipitations -->
+<div id="precip" class="tab-content">
+
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/Precipitation2023-2025/DBoardPrecipitation2023"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/Precipitation2023-2025/DBoardPrecipitation2024"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+
+    <script type="module" src="https://prod-ca-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+
+    <tableau-viz 
+        id="tableauViz"
+        src="https://prod-ca-a.online.tableau.com/t/youj07-34002de9ea/views/Precipitation2023-2025/DBoardPrecipitation2025"
+        width="100%"
+        height="800"
+        hide-tabs
+        toolbar="hidden">
+    </tableau-viz>
+</div>
+
+<!-- Résultats des procédures stockées -->
+<div id="results" class="tab-content">
+    <h2>Résultats des procédures stockées</h2>
+
+    <div class="sp-group">
+        <h3>Température</h3>
+        <div class="sp-grid">
+            <div class="sp-card" id="txt-spAnneeMoinsChaude"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spAnneePlusChaude"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spProvinceMoinsChaude"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spProvincePlusChaude"><span class="sp-loading">Chargement…</span></div>
+        </div>
+    </div>
+
+    <div class="sp-group">
+        <h3>Pollution CO₂</h3>
+        <div class="sp-grid">
+            <div class="sp-card" id="txt-spAnneeMoinsPollue"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spAnneePlusPollue"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spProvinceMoinsPollue"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spProvincePlusPollue"><span class="sp-loading">Chargement…</span></div>
+        </div>
+    </div>
+
+    <div class="sp-group">
+        <h3>Précipitation</h3>
+        <div class="sp-grid">
+            <div class="sp-card" id="txt-spAnneeMoinsPluvieuse"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spAnneePlusPluvieuse"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spProvinceMoinsPlusieuse"><span class="sp-loading">Chargement…</span></div>
+            <div class="sp-card" id="txt-spProvincePlusPlusieuse"><span class="sp-loading">Chargement…</span></div>
+        </div>
+    </div>
+
+    <script>
+    // Gabarits de texte pour chacune des 12 procédures.
+    // {col1} = valeur numérique, {col2} = libellé (année ou province)
+    const spTemplates = {
+        spAnneeMoinsChaude:        "L’année ayant la température la moins chaude est {col2} avec une température de {col1} °C",
+        spAnneePlusChaude:         "L’année ayant la température la plus chaude est {col2} avec une température de {col1} °C",
+        spProvinceMoinsChaude:     "La province ayant la température la moins chaude est {col2} avec une température de {col1} °C",
+        spProvincePlusChaude:      "La province ayant la température la plus chaude est {col2} avec une température de {col1} °C",
+
+        spAnneeMoinsPollue:        "L’année ayant le taux d’émission de CO2 le moins élevé est {col2} avec un taux de {col1} MT",
+        spAnneePlusPollue:         "L’année ayant le taux d’émission de CO2 le plus élevé est {col2} avec un taux de {col1} MT",
+        spProvinceMoinsPollue:     "La province ayant le taux d’émission de CO2 le moins élevé est {col2} avec un taux de {col1} MT",
+        spProvincePlusPollue:      "La province ayant le taux d’émission de CO2 le plus élevé est {col2} avec un taux de {col1} MT",
+
+        spAnneeMoinsPluvieuse:     "L’année ayant le taux de précipitation le moins élevé est {col2} avec un taux de {col1} mm",
+        spAnneePlusPluvieuse:      "L’année ayant le taux de précipitation le plus élevé est {col2} avec un taux de {col1} mm",
+        spProvinceMoinsPlusieuse:  "La province ayant le taux de précipitation le moins élevé est {col2} avec un taux de {col1} mm",
+        spProvincePlusPlusieuse:   "La province ayant le taux de précipitation le plus élevé est {col2} avec un taux de {col1} mm"
+    };
+
+    function renderResult(sp, data) {
+        const el = document.getElementById("txt-" + sp);
+        if (!el) return;
+
+        if (!data || data.ok === false) {
+            el.classList.add("sp-error");
+            el.textContent = "Donnée indisponible (" + sp + ")";
+            return;
+        }
+
+        const template = spTemplates[sp] || "{col2} : {col1}";
+        el.textContent = template
+            .replace("{col1}", data.col1 ?? "?")
+            .replace("{col2}", data.col2 ?? "?");
+    }
+
+fetch("/api/resultats")
+    .then(res => {
+
+        if (!res.ok) {
+            throw new Error(
+                "Erreur HTTP " + res.status
+            );
+        }
+
+        return res.json();
+    })
+
+    .then(data => {
+
+        console.log("Résultats reçus :", data);
+
+        Object.values(
+            data.temperature || {}
+        ).forEach(r => {
+            renderResult(r.sp, r);
+        });
+
+        Object.values(
+            data.pollution || {}
+        ).forEach(r => {
+            renderResult(r.sp, r);
+        });
+
+        Object.values(
+            data.precipitation || {}
+        ).forEach(r => {
+            renderResult(r.sp, r);
+        });
+
+    })
+
+    .catch(err => {
+
+        console.error(
+            "Erreur API :",
+            err
+        );
+
+        document
+            .querySelectorAll(".sp-card")
+            .forEach(card => {
+
+                card.classList.add(
+                    "sp-error"
+                );
+
+                card.textContent =
+                    "Erreur : impossible de contacter le serveur.";
+            });
+    });
+
+    </script>
+
+</div>
+
+<!-- Équipe -->
+<div id="team" class="tab-content">
+    <h2>Membres du groupe</h2>
+
+    <p class="team-note">Tout le monde a participé à toutes les parties.</p>
+
+    <div class="team-member">
+        <img src="desire.JPG" alt="Photo de Désiré">
+        <p><strong>Désiré</strong>Contribution : Design BD, procédures stockées</p>
+    </div>
+
+    <div class="team-member">
+        <img src="reginald.JPG" alt="Photo de Reginald">
+        <p><strong>Reginald</strong>Contribution : Frontend, intégration Power BI</p>
+    </div>
+
+    <div class="team-member">
+        <img src="martial.PNG" alt="Photo de Martial">
+        <p><strong>Martial</strong>Contribution : Backend, triggers SQL</p>
+    </div>
+</div>
+
+<footer>
+    Projet INF4163 – Université du Québec en Outaouais – Été 2026
+</footer>
+
+<script>
+    openTab('temp');
+</script>
+
+</body>
+</html>
